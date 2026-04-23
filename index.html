@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Lumière Beauty — Skin Consultation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e10;
+    --surface: #1a1a1d;
+    --surface2: #242428;
+    --border: rgba(255,255,255,0.07);
+    --bot-bubble: #1e1e22;
+    --user-bubble: #c9a96e;
+    --user-bubble-text: #0e0e10;
+    --text-primary: #f0ede8;
+    --text-secondary: #8a8680;
+    --text-muted: #5a5755;
+    --gold: #c9a96e;
+    --gold-light: #dfc08a;
+    --gold-dark: #a07c42;
+    --green: #25D366;
+    --radius-bubble: 18px;
+    --radius-sm: 10px;
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    overflow: hidden;
+  }
+
+  /* ── WRAPPER ── */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    background: var(--bg);
+    box-shadow: 0 0 80px rgba(0,0,0,0.8);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+
+  .header-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a96e, #a07c42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .header-info { flex: 1; }
+
+  .header-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--text-primary);
+    letter-spacing: 0.2px;
+    line-height: 1.2;
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    color: #4caf8a;
+    font-weight: 400;
+    margin-top: 1px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4caf8a;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── CHAT AREA ── */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scroll-behavior: smooth;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 0; }
+
+  /* ── DATE DIVIDER ── */
+  .date-chip {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    align-self: center;
+    margin: 8px 0;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── BUBBLES ── */
+  .bubble-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: bubbleIn 0.35s ease forwards;
+  }
+
+  @keyframes bubbleIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bubble-row.bot { justify-content: flex-start; }
+  .bubble-row.user { justify-content: flex-end; }
+
+  .bot-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a96e, #8a6535);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+  }
+
+  .bubble {
+    max-width: 78%;
+    padding: 10px 14px;
+    line-height: 1.55;
+    font-size: 14px;
+    position: relative;
+    word-break: break-word;
+  }
+
+  .bubble.bot {
+    background: var(--bot-bubble);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+    color: var(--text-primary);
+  }
+
+  .bubble.user {
+    background: var(--user-bubble);
+    border-radius: var(--radius-bubble) var(--radius-bubble) 4px var(--radius-bubble);
+    color: var(--user-bubble-text);
+    font-weight: 500;
+  }
+
+  .bubble-time {
+    font-size: 10px;
+    opacity: 0.5;
+    display: block;
+    text-align: right;
+    margin-top: 3px;
+  }
+
+  /* ── TYPING INDICATOR ── */
+  .typing-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    opacity: 0;
+    animation: bubbleIn 0.3s ease forwards;
+  }
+
+  .typing-bubble {
+    background: var(--bot-bubble);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: typing 1.4s ease infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* ── OPTIONS ── */
+  .options-area {
+    padding: 10px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .options-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 0 2px;
+    margin-bottom: 2px;
+  }
+
+  .options-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .options-grid.cols-1 { grid-template-columns: 1fr; }
+
+  .option-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 400;
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .option-btn:hover, .option-btn:active {
+    background: var(--surface2);
+    border-color: var(--gold-dark);
+    color: var(--gold-light);
+  }
+
+  .option-icon {
+    font-size: 17px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    padding: 10px 14px 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .text-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 11px 18px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .text-input::placeholder { color: var(--text-muted); }
+
+  .text-input:focus { border-color: var(--gold-dark); }
+
+  .send-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: var(--gold-light); }
+  .send-btn:active { transform: scale(0.93); }
+
+  .send-btn svg { width: 18px; height: 18px; fill: var(--user-bubble-text); }
+
+  /* ── VOUCHER CARD ── */
+  .voucher-card {
+    margin: 4px 0;
+    background: linear-gradient(135deg, #1a1810, #231f14);
+    border: 1px solid var(--gold-dark);
+    border-radius: 14px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .voucher-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .voucher-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .voucher-code {
+    font-family: 'Courier New', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+
+  .voucher-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .voucher-expiry {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── CTA BUTTON ── */
+  .cta-area {
+    padding: 0 16px 24px;
+    flex-shrink: 0;
+  }
+
+  .cta-btn {
+    width: 100%;
+    background: var(--green);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 24px rgba(37,211,102,0.2);
+  }
+
+  .cta-btn:hover { background: #20c05a; }
+  .cta-btn:active { transform: scale(0.98); }
+
+  .cta-btn svg { width: 20px; height: 20px; fill: #fff; }
+
+  /* ── RECOMMENDATION BUBBLE ── */
+  .rec-bubble {
+    background: linear-gradient(135deg, #1d1b14, #1a1810);
+    border: 1px solid var(--gold-dark);
+    border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+    padding: 14px 16px;
+    max-width: 85%;
+  }
+
+  .rec-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .rec-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .rec-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+
+  .rec-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .rec-detail-item {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rec-detail-item span { color: var(--gold-light); font-weight: 500; }
+
+  /* ── HIDDEN ── */
+  .hidden { display: none !important; }
+
+  /* ── SPARKLE OVERLAY ── */
+  .bg-texture {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(201,169,110,0.04) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 20%, rgba(201,169,110,0.03) 0%, transparent 50%);
+    z-index: 0;
+  }
+
+  .app > * { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+<div class="bg-texture"></div>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-avatar">✦</div>
+    <div class="header-info">
+      <div class="header-name">Lumière Skin Advisor</div>
+      <div class="header-status"><span class="status-dot"></span> online</div>
+    </div>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-area" id="chatArea">
+    <div class="date-chip">Today</div>
+  </div>
+
+  <!-- OPTIONS / INPUT (swapped dynamically) -->
+  <div class="options-area hidden" id="optionsArea">
+    <div class="options-label" id="optionsLabel">Choose an option</div>
+    <div class="options-grid" id="optionsGrid"></div>
+  </div>
+
+  <div class="input-area hidden" id="inputArea">
+    <input class="text-input" id="textInput" type="text" autocomplete="off" />
+    <button class="send-btn" id="sendBtn">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+
+  <div class="cta-area hidden" id="ctaArea">
+    <button class="cta-btn" id="ctaBtn">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.484 2 12.017c0 1.99.525 3.855 1.438 5.462L2 22l4.656-1.413A9.957 9.957 0 0011.999 22C17.523 22 22 17.516 22 11.983 22 6.451 17.523 2 11.999 2z"/></svg>
+      Book My Treatment on WhatsApp
+    </button>
+  </div>
+
+</div>
+
+<script>
+const SALON_WHATSAPP = "919999999999"; // ← replace with real number
+
+// ── RECOMMENDATION MAP ──
+function getRecommendation(skin, concern, urgency) {
+  const map = {
+    oily: {
+      acne:       { name: "Deep Pore Purifying Facial", desc: "A salicylic acid + clay mask treatment that clears active breakouts and tightens pores. Includes high-frequency therapy to calm inflammation.", duration: "60 min", price: "₹1,499" },
+      dullness:   { name: "Vitamin C Brightening Peel", desc: "A mild glycolic + vitamin C peel that exfoliates dead cells and restores radiance without over-drying oily skin.", duration: "45 min", price: "₹1,299" },
+      pigmentation:{ name: "AHA Resurfacing Treatment", desc: "Targets post-acne marks and sun spots using a lactic acid peel layered with kojic serum for visible brightening.", duration: "60 min", price: "₹1,799" },
+      default:    { name: "Oil Control Balancing Facial", desc: "A mattifying treatment with kaolin clay and niacinamide that regulates sebum and minimises pores.", duration: "50 min", price: "₹1,199" }
+    },
+    dry: {
+      acne:       { name: "Calming Hydra-Clear Facial", desc: "A gentle barrier-repair facial using centella and hyaluronic acid — clears congestion without stripping moisture.", duration: "60 min", price: "₹1,599" },
+      dullness:   { name: "Moisture Surge Glow Treatment", desc: "Intense hydration infusion with hyaluronic layering and a brightening enzyme mask for plump, lit-from-within skin.", duration: "75 min", price: "₹1,799" },
+      pigmentation:{ name: "Hydrating Vitamin C Infusion", desc: "A nourishing brightening treatment using stable vitamin C serum and a peptide masque to fade spots without dryness.", duration: "60 min", price: "₹1,699" },
+      default:    { name: "Deep Replenishing Facial", desc: "A ceramide + squalane facial that restores the skin barrier, reduces flakiness, and adds lasting hydration.", duration: "70 min", price: "₹1,499" }
+    },
+    combination: {
+      acne:       { name: "Zone-Balance Purifying Facial", desc: "Targets the T-zone with BHA while keeping cheeks moisturised — eliminates breakouts without creating new dry patches.", duration: "60 min", price: "₹1,499" },
+      dullness:   { name: "Dual-Zone Radiance Facial", desc: "Enzyme exfoliation for the T-zone and a brightening serum for dry zones — balanced glow without over-treating.", duration: "55 min", price: "₹1,399" },
+      pigmentation:{ name: "Even Tone Corrective Facial", desc: "A targeted pigmentation treatment using mandelic acid and tranexamic serum — safe for combination skin's varied zones.", duration: "65 min", price: "₹1,799" },
+      default:    { name: "Balancing Microzone Facial", desc: "Customised to treat oily and dry zones separately in one session — zero compromise, maximum results.", duration: "60 min", price: "₹1,299" }
+    },
+    sensitive: {
+      acne:       { name: "Calm & Clear Sensitive Facial", desc: "Sulphur + allantoin based treatment for reactive skin prone to breakouts — zero fragrance, zero irritation.", duration: "60 min", price: "₹1,599" },
+      dullness:   { name: "Redness Relief Glow Facial", desc: "Azelaic acid + panthenol masque that reduces redness while gently brightening — safe for rosacea-prone skin.", duration: "50 min", price: "₹1,499" },
+      pigmentation:{ name: "Gentle Brightening Infusion", desc: "A soothing niacinamide + licorice root treatment that fades pigmentation without triggering sensitivity.", duration: "60 min", price: "₹1,699" },
+      default:    { name: "Barrier Rescue Facial", desc: "A fragrance-free, minimal-ingredient treatment to repair a compromised skin barrier and reduce chronic redness.", duration: "55 min", price: "₹1,399" }
+    }
+  };
+  const skinMap = map[skin] || map["combination"];
+  return skinMap[concern] || skinMap["default"];
+}
+
+// ── STATE ──
+const state = { skin: null, concern: null, urgency: null, name: null, phone: null, step: 0 };
+
+// ── FLOW STEPS ──
+const steps = [
+  { type: "bot", text: "Hi! 👋 I'm your personal skin advisor from *Lumière*.\n\nI'll suggest the perfect treatment for your skin — takes about 60 seconds. Ready?" },
+  { type: "options", key: "skin", label: "What's your skin type?", cols: 2, choices: [
+    { icon: "💧", label: "Oily", value: "oily" },
+    { icon: "🌸", label: "Dry", value: "dry" },
+    { icon: "✨", label: "Combination", value: "combination" },
+    { icon: "🌿", label: "Sensitive", value: "sensitive" }
+  ]},
+  { type: "options", key: "concern", label: "What's your main skin concern?", cols: 2, choices: [
+    { icon: "🔴", label: "Acne & Breakouts", value: "acne" },
+    { icon: "🌟", label: "Dullness & Glow", value: "dullness" },
+    { icon: "🌑", label: "Pigmentation", value: "pigmentation" },
+    { icon: "💦", label: "Hydration", value: "default" }
+  ]},
+  { type: "options", key: "urgency", label: "What brings you here?", cols: 1, choices: [
+    { icon: "🎉", label: "I have an event / occasion coming up", value: "event" },
+    { icon: "🗓", label: "Regular skin maintenance", value: "general" }
+  ]},
+  { type: "bot", text: "Perfect — I've found the ideal treatment for your skin. ✦\n\nBefore I share it, may I get your name?" },
+  { type: "input", key: "name", placeholder: "Your first name", inputMode: "text" },
+  { type: "bot_dynamic", fn: (s) => `Thanks, ${s.name}! One last thing — your WhatsApp number so I can send your consultation summary.` },
+  { type: "input", key: "phone", placeholder: "WhatsApp number", inputMode: "numeric" },
+  { type: "result" }
+];
+
+// ── HELPERS ──
+function now() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function chatArea() { return document.getElementById("chatArea"); }
+
+function scrollBottom() {
+  setTimeout(() => { chatArea().scrollTop = chatArea().scrollHeight; }, 50);
+}
+
+function showTyping(cb, delay = 1200) {
+  const row = document.createElement("div");
+  row.className = "typing-row";
+  row.id = "typingIndicator";
+  row.innerHTML = `
+    <div class="bot-icon">✦</div>
+    <div class="typing-bubble">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>`;
+  chatArea().appendChild(row);
+  scrollBottom();
+  setTimeout(() => {
+    row.remove();
+    cb();
+  }, delay);
+}
+
+function addBotBubble(html, isRec = false) {
+  const row = document.createElement("div");
+  row.className = "bubble-row bot";
+  if (isRec) {
+    row.innerHTML = `<div class="bot-icon">✦</div><div class="rec-bubble">${html}<span class="bubble-time">${now()}</span></div>`;
+  } else {
+    const formatted = html.replace(/\*(.*?)\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    row.innerHTML = `<div class="bot-icon">✦</div><div class="bubble bot">${formatted}<span class="bubble-time">${now()}</span></div>`;
+  }
+  chatArea().appendChild(row);
+  scrollBottom();
+}
+
+function addUserBubble(text) {
+  const row = document.createElement("div");
+  row.className = "bubble-row user";
+  row.innerHTML = `<div class="bubble user">${text}<span class="bubble-time">${now()}</span></div>`;
+  chatArea().appendChild(row);
+  scrollBottom();
+}
+
+function addVoucher() {
+  const row = document.createElement("div");
+  row.className = "bubble-row bot";
+  row.innerHTML = `
+    <div class="bot-icon">✦</div>
+    <div class="voucher-card">
+      <div class="voucher-title">✦ Your Exclusive Offer</div>
+      <div class="voucher-code">GLOW20</div>
+      <div class="voucher-desc">20% off your first treatment when you book this week</div>
+      <div class="voucher-expiry">Valid for 7 days · Mention this code at reception</div>
+    </div>`;
+  chatArea().appendChild(row);
+  scrollBottom();
+}
+
+function hideControls() {
+  document.getElementById("optionsArea").classList.add("hidden");
+  document.getElementById("inputArea").classList.add("hidden");
+}
+
+function showOptions(step) {
+  const area = document.getElementById("optionsArea");
+  const grid = document.getElementById("optionsGrid");
+  const label = document.getElementById("optionsLabel");
+  label.textContent = step.label;
+  grid.className = `options-grid ${step.cols === 2 ? 'cols-2' : 'cols-1'}`;
+  grid.innerHTML = "";
+  step.choices.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerHTML = `<span class="option-icon">${c.icon}</span>${c.label}`;
+    btn.addEventListener("click", () => handleOption(c, step.key));
+    grid.appendChild(btn);
+  });
+  area.classList.remove("hidden");
+  document.getElementById("inputArea").classList.add("hidden");
+}
+
+function showInput(step) {
+  const area = document.getElementById("inputArea");
+  const inp = document.getElementById("textInput");
+  inp.placeholder = step.placeholder;
+  inp.inputMode = step.inputMode || "text";
+  inp.value = "";
+  area.classList.remove("hidden");
+  document.getElementById("optionsArea").classList.add("hidden");
+  setTimeout(() => inp.focus(), 300);
+}
+
+function showCTA() {
+  hideControls();
+  document.getElementById("ctaArea").classList.remove("hidden");
+}
+
+// ── NAVIGATION ──
+function handleOption(choice, key) {
+  state[key] = choice.value;
+  addUserBubble(choice.label);
+  hideControls();
+  advanceStep();
+}
+
+document.getElementById("sendBtn").addEventListener("click", submitInput);
+document.getElementById("textInput").addEventListener("keydown", e => { if (e.key === "Enter") submitInput(); });
+
+function submitInput() {
+  const inp = document.getElementById("textInput");
+  const val = inp.value.trim();
+  if (!val) return;
+  const currentStep = steps[state.step];
+  if (currentStep.type === "input") {
+    if (currentStep.key === "phone" && !/^[6-9]\d{9}$/.test(val.replace(/\s/g, ""))) {
+      inp.style.borderColor = "#e05050";
+      setTimeout(() => inp.style.borderColor = "", 1000);
+      return;
+    }
+    state[currentStep.key] = val;
+    addUserBubble(currentStep.key === "phone" ? val.replace(/(\d{5})(\d{5})/, "$1 $2") : val);
+    hideControls();
+    advanceStep();
+  }
+}
+
+function advanceStep() {
+  state.step++;
+  runStep();
+}
+
+function runStep() {
+  const step = steps[state.step];
+  if (!step) return;
+
+  if (step.type === "bot") {
+    showTyping(() => {
+      addBotBubble(step.text);
+      advanceStep();
+    }, 900 + step.text.length * 5);
+
+  } else if (step.type === "bot_dynamic") {
+    showTyping(() => {
+      addBotBubble(step.fn(state));
+      advanceStep();
+    }, 900);
+
+  } else if (step.type === "options") {
+    setTimeout(() => showOptions(step), 200);
+
+  } else if (step.type === "input") {
+    setTimeout(() => showInput(step), 200);
+
+  } else if (step.type === "result") {
+    showResult();
+  }
+}
+
+function showResult() {
+  const rec = getRecommendation(state.skin, state.concern, state.urgency);
+
+  showTyping(() => {
+    // Personalized opener
+    addBotBubble(`${state.name}, based on your answers, here's exactly what your skin needs 👇`);
+
+    setTimeout(() => {
+      // Recommendation card
+      addBotBubble(`
+        <div class="rec-tag">✦ Your Recommended Treatment</div>
+        <div class="rec-title">${rec.name}</div>
+        <div class="rec-desc">${rec.desc}</div>
+        <div class="rec-details">
+          <div class="rec-detail-item">⏱ <span>${rec.duration}</span></div>
+          <div class="rec-detail-item">💰 <span>${rec.price}</span></div>
+          ${state.urgency === "event" ? '<div class="rec-detail-item">🎉 <span>Event-ready in 1 session</span></div>' : ''}
+        </div>`, true);
+    }, 400);
+
+    setTimeout(() => {
+      addVoucher();
+    }, 900);
+
+    setTimeout(() => {
+      showTyping(() => {
+        addBotBubble(`Tap below to book directly — our team will confirm your slot within minutes. We have limited openings this week! 🗓`);
+        setTimeout(showCTA, 300);
+      }, 800);
+    }, 1400);
+
+  }, 1800);
+
+  // Set up WhatsApp CTA
+  const msg = encodeURIComponent(
+    `Hi! I just completed the skin consultation on your website.\n\nMy name is ${state.name} and I'd like to book the *${rec.name}* treatment.\n\nMy skin type: ${state.skin} | Concern: ${state.concern}\n\nVoucher code: GLOW20`
+  );
+  document.getElementById("ctaBtn").addEventListener("click", () => {
+    window.open(`https://wa.me/${SALON_WHATSAPP}?text=${msg}`, "_blank");
+  });
+}
+
+// ── START ──
+showTyping(() => {
+  addBotBubble(steps[0].text);
+  state.step = 1;
+  runStep();
+}, 800);
+</script>
+</body>
+</html>
