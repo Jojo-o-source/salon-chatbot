@@ -519,7 +519,7 @@
 </div>
 
 <script>
-const SALON_WHATSAPP = "917205661998"; // ← replace with real number
+const SALON_WHATSAPP = "919999999999"; // ← replace with real number
 
 // ── RECOMMENDATION ENGINE ──
 function getRecommendation(skin, concern, severity, urgency, experience) {
@@ -762,6 +762,33 @@ function handleOption(choice, key) {
 document.getElementById("sendBtn").addEventListener("click", submitInput);
 document.getElementById("textInput").addEventListener("keydown", e => { if (e.key === "Enter") submitInput(); });
 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1rmRKMOlG0e09Q97Jus4i53QdvdbXlY1Bhk-P_VvZdgFdaaII8PsidreISg4jfizd/exec'; // ← paste your Apps Script web app URL here
+
+async function postToSheet() {
+  const payload = {
+    name:       state.name,
+    phone:      state.phone,
+    skin:       state.skin,
+    concern:    state.concern,
+    severity:   state.severity,
+    urgency:    state.urgency,
+    experience: state.experience,
+    timestamp:  new Date().toISOString()
+  };
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // required for Google Apps Script
+      cache: 'no-cache',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    console.log("Data sent to Sheet");
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+}
+
 function submitInput() {
   const inp = document.getElementById("textInput");
   const val = inp.value.trim();
@@ -776,6 +803,12 @@ function submitInput() {
     state[currentStep.key] = val;
     addUserBubble(currentStep.key === "phone" ? val.replace(/(\d{5})(\d{5})/, "$1 $2") : val);
     hideControls();
+
+    // Fire-and-forget POST once phone is collected (name already in state)
+    if (currentStep.key === "phone") {
+      postToSheet();
+    }
+
     advanceStep();
   }
 }
