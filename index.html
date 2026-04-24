@@ -1,240 +1,936 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expert Skin Consultation | Premium Aesthetics</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .chat-container { height: 100vh; max-width: 500px; margin: 0 auto; background: white; display: flex; flex-direction: column; box-shadow: 0 4px 30px rgba(0,0,0,0.05); }
-        .messages-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14.5px; line-height: 1.5; position: relative; animation: fadeIn 0.3s ease; }
-        .msg-bot { background: #f0f0f0; color: #1a1a1a; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .msg-user { background: #1a1a1a; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .options-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; justify-content: flex-end; }
-        .option-btn { background: white; border: 1.5px solid #1a1a1a; color: #1a1a1a; padding: 8px 16px; border-radius: 20px; font-size: 13.5px; cursor: pointer; transition: 0.2s; font-weight: 500; }
-        .option-btn:hover { background: #1a1a1a; color: white; }
-        .typing { font-style: italic; font-size: 12px; color: #888; margin-bottom: 10px; display: none; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        input { border: 1.5px solid #e0e0e0; border-radius: 12px; padding: 12px; outline: none; width: 100%; margin-top: 10px; font-size: 14px; }
-        input:focus { border-color: #1a1a1a; }
-        .cta-btn { background: #25D366; color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: 600; display: block; margin-top: 20px; text-decoration: none; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Lumière Beauty — Skin Consultation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e10;
+    --surface: #1a1a1d;
+    --surface2: #242428;
+    --border: rgba(255,255,255,0.07);
+    --bot-bubble: #1e1e22;
+    --user-bubble: #c9a96e;
+    --user-bubble-text: #0e0e10;
+    --text-primary: #f0ede8;
+    --text-secondary: #8a8680;
+    --text-muted: #5a5755;
+    --gold: #c9a96e;
+    --gold-light: #dfc08a;
+    --gold-dark: #a07c42;
+    --green: #25D366;
+    --radius-bubble: 18px;
+    --radius-sm: 10px;
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    overflow: hidden;
+  }
+
+  /* ── WRAPPER ── */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    background: var(--bg);
+    box-shadow: 0 0 80px rgba(0,0,0,0.8);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+
+  .header-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a96e, #a07c42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .header-info { flex: 1; }
+
+  .header-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--text-primary);
+    letter-spacing: 0.2px;
+    line-height: 1.2;
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    color: #4caf8a;
+    font-weight: 400;
+    margin-top: 1px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4caf8a;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── CHAT AREA ── */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scroll-behavior: smooth;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 0; }
+
+  /* ── DATE DIVIDER ── */
+  .date-chip {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    align-self: center;
+    margin: 8px 0;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── BUBBLES ── */
+  .bubble-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: bubbleIn 0.35s ease forwards;
+  }
+
+  @keyframes bubbleIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bubble-row.bot { justify-content: flex-start; }
+  .bubble-row.user { justify-content: flex-end; }
+
+  .bot-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a96e, #8a6535);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+  }
+
+  .bubble {
+    max-width: 78%;
+    padding: 10px 14px;
+    line-height: 1.55;
+    font-size: 14px;
+    position: relative;
+    word-break: break-word;
+  }
+
+  .bubble.bot {
+    background: var(--bot-bubble);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+    color: var(--text-primary);
+  }
+
+  .bubble.user {
+    background: var(--user-bubble);
+    border-radius: var(--radius-bubble) var(--radius-bubble) 4px var(--radius-bubble);
+    color: var(--user-bubble-text);
+    font-weight: 500;
+  }
+
+  .bubble-time {
+    font-size: 10px;
+    opacity: 0.5;
+    display: block;
+    text-align: right;
+    margin-top: 3px;
+  }
+
+  /* ── TYPING INDICATOR ── */
+  .typing-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    opacity: 0;
+    animation: bubbleIn 0.3s ease forwards;
+  }
+
+  .typing-bubble {
+    background: var(--bot-bubble);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: typing 1.4s ease infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* ── OPTIONS ── */
+  .options-area {
+    padding: 10px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .options-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 0 2px;
+    margin-bottom: 2px;
+  }
+
+  .options-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .options-grid.cols-1 { grid-template-columns: 1fr; }
+
+  .option-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 400;
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .option-btn:hover, .option-btn:active {
+    background: var(--surface2);
+    border-color: var(--gold-dark);
+    color: var(--gold-light);
+  }
+
+  .option-icon {
+    font-size: 17px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    padding: 10px 14px 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .text-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 11px 18px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .text-input::placeholder { color: var(--text-muted); }
+
+  .text-input:focus { border-color: var(--gold-dark); }
+
+  .send-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: var(--gold-light); }
+  .send-btn:active { transform: scale(0.93); }
+
+  .send-btn svg { width: 18px; height: 18px; fill: var(--user-bubble-text); }
+
+  /* ── VOUCHER CARD ── */
+  .voucher-card {
+    margin: 4px 0;
+    background: linear-gradient(135deg, #1a1810, #231f14);
+    border: 1px solid var(--gold-dark);
+    border-radius: 14px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .voucher-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .voucher-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .voucher-code {
+    font-family: 'Courier New', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+
+  .voucher-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .voucher-expiry {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── CTA BUTTON ── */
+  .cta-area {
+    padding: 0 16px 24px;
+    flex-shrink: 0;
+  }
+
+  .cta-btn {
+    width: 100%;
+    background: var(--green);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 24px rgba(37,211,102,0.2);
+  }
+
+  .cta-btn:hover { background: #20c05a; }
+  .cta-btn:active { transform: scale(0.98); }
+
+  .cta-btn svg { width: 20px; height: 20px; fill: #fff; }
+
+  /* ── RECOMMENDATION BUBBLE ── */
+  .rec-bubble {
+    background: linear-gradient(135deg, #1d1b14, #1a1810);
+    border: 1px solid var(--gold-dark);
+    border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+    padding: 14px 16px;
+    max-width: 85%;
+  }
+
+  .rec-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .rec-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .rec-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+
+  .rec-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .rec-detail-item {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rec-detail-item span { color: var(--gold-light); font-weight: 500; }
+
+  /* ── HIDDEN ── */
+  .hidden { display: none !important; }
+
+  /* ── SPARKLE OVERLAY ── */
+  .bg-texture {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(201,169,110,0.04) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 20%, rgba(201,169,110,0.03) 0%, transparent 50%);
+    z-index: 0;
+  }
+
+  .app > * { position: relative; z-index: 1; }
+</style>
 </head>
 <body>
+<div class="bg-texture"></div>
+<div class="app">
 
-<div class="chat-container">
-    <div class="p-4 border-b flex items-center gap-3 bg-white sticky top-0 z-10">
-        <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold text-xs">SA</div>
-        <div>
-            <h1 class="text-sm font-semibold">Senior Skin Consultant</h1>
-            <p class="text-[10px] text-green-500 font-medium">● Online</p>
-        </div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-avatar">✦</div>
+    <div class="header-info">
+      <div class="header-name">Lumière Skin Advisor</div>
+      <div class="header-status"><span class="status-dot"></span> online</div>
     </div>
+  </div>
 
-    <div class="messages-area" id="chat-box">
-        <div id="typing-indicator" class="typing">Consultant is typing...</div>
-    </div>
+  <!-- CHAT AREA -->
+  <div class="chat-area" id="chatArea">
+    <div class="date-chip">Today</div>
+  </div>
 
-    <div id="input-container" class="p-4 border-t bg-gray-50 hidden">
-        <div id="form-fields"></div>
-        <button id="submit-lead" class="w-full bg-black text-white p-3 rounded-xl mt-3 font-medium text-sm">Review My Results</button>
-    </div>
+  <!-- OPTIONS / INPUT (swapped dynamically) -->
+  <div class="options-area hidden" id="optionsArea">
+    <div class="options-label" id="optionsLabel">Choose an option</div>
+    <div class="options-grid" id="optionsGrid"></div>
+  </div>
+
+  <div class="input-area hidden" id="inputArea">
+    <input class="text-input" id="textInput" type="text" autocomplete="off" />
+    <button class="send-btn" id="sendBtn">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+
+  <div class="cta-area hidden" id="ctaArea">
+    <button class="cta-btn" id="ctaBtn">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.484 2 12.017c0 1.99.525 3.855 1.438 5.462L2 22l4.656-1.413A9.957 9.957 0 0011.999 22C17.523 22 22 17.516 22 11.983 22 6.451 17.523 2 11.999 2z"/></svg>
+      Book My Treatment on WhatsApp
+    </button>
+  </div>
+
 </div>
 
 <script>
-    const chatBox = document.getElementById('chat-box');
-    const typingIndicator = document.getElementById('typing-indicator');
-    const inputContainer = document.getElementById('input-container');
-    const formFields = document.getElementById('form-fields');
-    const submitBtn = document.getElementById('submit-lead');
+const SALON_WHATSAPP = "917205661998"; // ← replace with real number
 
-    let userData = {
-        skinType: '',
-        concern: '',
-        severity: '',
-        urgency: '',
-        experience: '',
-        name: '',
-        phone: ''
-    };
+// ── RECOMMENDATION ENGINE ──
+function getRecommendation(skin, concern, severity, urgency, experience) {
 
-    const questions = [
-        {
-            id: 'skinType',
-            text: "Welcome. I’ll provide a professional assessment in under 60 seconds. To start, what is your skin type?",
-            options: ['Oily/Acne-Prone', 'Dry/Flaky', 'Combination', 'Sensitive']
-        },
-        {
-            id: 'concern',
-            text: "Which of these is your primary concern currently?",
-            options: ['Active acne / breakouts', 'Acne marks / pigmentation', 'Dull & uneven tone', 'Dehydrated / flaky skin']
-        },
-        {
-            id: 'severity',
-            text: "How serious is this concern?",
-            options: ['Mild (just started)', 'Moderate (recurring)', 'Severe (persistent)']
-        },
-        {
-            id: 'urgency',
-            text: "When do you want to see results?",
-            options: ['In 3–5 days (urgent)', 'In 2–3 weeks', 'Long-term improvement']
-        },
-        {
-            id: 'experience',
-            text: "Have you tried any professional treatments before?",
-            options: ['First time', 'Tried facials before', 'Tried but didn’t see results']
-        }
-    ];
-
-    let currentStep = 0;
-
-    function showTyping() {
-        typingIndicator.style.display = 'block';
-        chatBox.appendChild(typingIndicator);
-        chatBox.scrollTop = chatBox.scrollHeight;
+  // Base treatment matrix: skin × concern
+  const base = {
+    oily: {
+      acne:          { name: "Salicylic Deep Pore Purge", duration: "60 min", price: "₹1,499", priceNum: 1499 },
+      marks:         { name: "AHA Resurfacing Peel",      duration: "55 min", price: "₹1,799", priceNum: 1799 },
+      dullness:      { name: "Vitamin C Brightening Peel",duration: "50 min", price: "₹1,299", priceNum: 1299 },
+      dehydration:   { name: "Oil-Balance Aqua Infusion", duration: "55 min", price: "₹1,199", priceNum: 1199 }
+    },
+    dry: {
+      acne:          { name: "Hydra-Clear Repair Facial",  duration: "60 min", price: "₹1,599", priceNum: 1599 },
+      marks:         { name: "Vitamin C Hydrating Infusion",duration:"65 min", price: "₹1,699", priceNum: 1699 },
+      dullness:      { name: "Moisture Surge Glow Ritual", duration: "75 min", price: "₹1,799", priceNum: 1799 },
+      dehydration:   { name: "Ceramide Barrier Restoration",duration:"70 min", price: "₹1,499", priceNum: 1499 }
+    },
+    combination: {
+      acne:          { name: "Zone-Balance BHA Facial",    duration: "60 min", price: "₹1,499", priceNum: 1499 },
+      marks:         { name: "Even Tone Mandelic Peel",    duration: "65 min", price: "₹1,799", priceNum: 1799 },
+      dullness:      { name: "Dual-Zone Radiance Facial",  duration: "55 min", price: "₹1,399", priceNum: 1399 },
+      dehydration:   { name: "Balancing Hydra-Microzone",  duration: "60 min", price: "₹1,299", priceNum: 1299 }
+    },
+    sensitive: {
+      acne:          { name: "Sulphur Calm & Clear Facial",duration: "60 min", price: "₹1,599", priceNum: 1599 },
+      marks:         { name: "Niacinamide Brightening Infusion",duration:"60 min",price:"₹1,699",priceNum:1699},
+      dullness:      { name: "Azelaic Redness Relief Glow",duration: "55 min", price: "₹1,499", priceNum: 1499 },
+      dehydration:   { name: "Barrier Rescue & Plump",    duration: "60 min", price: "₹1,399", priceNum: 1399 }
     }
+  };
 
-    function hideTyping() {
-        typingIndicator.style.display = 'none';
+  const skinMap = base[skin] || base["combination"];
+  const rec     = { ...(skinMap[concern] || skinMap["dehydration"]) };
+
+  // Severity modifier — upgrade treatment intensity & price for severe cases
+  if (severity === "severe") {
+    rec.name     += " (Advanced)";
+    rec.duration  = "75 min";
+    rec.priceNum += 300;
+    rec.price     = "₹" + rec.priceNum.toLocaleString("en-IN");
+  }
+
+  // ── Personalized reasoning (uses all 5 inputs) ──
+  const skinLabels   = { oily:"oily", dry:"dry", combination:"combination", sensitive:"sensitive" };
+  const concernMap   = { acne:"active breakouts", marks:"acne marks and pigmentation", dullness:"dullness and uneven tone", dehydration:"dehydration and flakiness" };
+  const severityMap  = { mild:"just starting to show", moderate:"recurring and frustrating", severe:"persistent and not responding to home care" };
+  const experienceCtx= {
+    first:    "Since this is your first professional treatment, we'll start with a full skin assessment before the session.",
+    tried:    "Since you've had facials before, our therapist will calibrate the intensity based on how your skin responded previously.",
+    noResult: "Since past treatments haven't delivered results, this protocol specifically addresses *why* standard facials often underperform — and corrects that."
+  };
+  const urgencyCtx   = {
+    urgent:   "Given your 3–5 day window, this treatment is specifically sequenced to deliver visible results within 48 hours of the session.",
+    medium:   "Within 2–3 weeks, you'll complete a 2-session protocol that builds on itself for compounding results.",
+    longterm: "This is the first session in a 4-week corrective plan — each session builds on the previous to deliver lasting change, not temporary fixes."
+  };
+
+  // Expected result copy
+  const resultMap = {
+    acne:       { fast:"Reduced inflammation and visibly calmer skin within 48 hours.", medium:"Active breakouts cleared and pore congestion reduced by session 2.", longterm:"Sustained breakout-free skin with regulated sebum production." },
+    marks:      { fast:"Noticeable lightening of surface marks, more even base tone.",   medium:"Post-acne spots visibly faded, skin texture smoother.",           longterm:"Significant reduction in PIH (post-inflammatory hyperpigmentation) across treated areas." },
+    dullness:   { fast:"Immediate glow with reduced greyness and more reflective skin.", medium:"Sustained radiance and noticeably more even complexion.",          longterm:"Cellular renewal cycle reset — skin maintains brightness between sessions." },
+    dehydration:{ fast:"Plump, non-flaky skin with restored softness within 24 hours.", medium:"Skin barrier strengthened, reduced tightness and sensitivity.",    longterm:"Long-term moisture retention improved — skin stays hydrated between sessions." }
+  };
+
+  const urgencyKey = urgency === "urgent" ? "fast" : urgency === "medium" ? "medium" : "longterm";
+  const expectedResult = (resultMap[concern] || resultMap["dehydration"])[urgencyKey];
+
+  // Timeframe
+  const timeframeMap = {
+    urgent:   "Visible improvement within 48 hours of your session.",
+    medium:   "Noticeable results after 2 sessions over 2–3 weeks.",
+    longterm: "Progressive improvement over 4 weeks — measurable skin change by week 3."
+  };
+
+  rec.reasoning = `Since you mentioned *${skinLabels[skin]} skin* with *${concernMap[concern] || "skin concerns"}* that are *${severityMap[severity] || "moderate"}*, this treatment is the most clinically aligned option for your profile. ${experienceCtx[experience] || experienceCtx["first"]} ${urgencyCtx[urgency] || urgencyCtx["medium"]}`;
+  rec.expectedResult = expectedResult;
+  rec.timeframe      = timeframeMap[urgency] || timeframeMap["medium"];
+
+  return rec;
+}
+
+// ── STATE ──
+const state = { skin: null, concern: null, severity: null, urgency: null, experience: null, name: null, phone: null, step: 0 };
+
+// ── FLOW STEPS ──
+const steps = [
+  { type: "bot", text: "Hi! 👋 I'm your personal skin advisor from *Lumière*.\n\nI'll suggest the right treatment for your exact skin situation — not a generic one. Takes 60 seconds." },
+  { type: "options", key: "skin", label: "What's your skin type?", cols: 2, choices: [
+    { icon: "💧", label: "Oily", value: "oily" },
+    { icon: "🌸", label: "Dry", value: "dry" },
+    { icon: "✨", label: "Combination", value: "combination" },
+    { icon: "🌿", label: "Sensitive", value: "sensitive" }
+  ]},
+  { type: "options", key: "concern", label: "What's your primary concern right now?", cols: 2, choices: [
+    { icon: "🔴", label: "Active acne / breakouts", value: "acne" },
+    { icon: "🌑", label: "Acne marks / pigmentation", value: "marks" },
+    { icon: "🌟", label: "Dull & uneven tone", value: "dullness" },
+    { icon: "💦", label: "Dehydrated / flaky skin", value: "dehydration" }
+  ]},
+  { type: "options", key: "severity", label: "How serious is this concern?", cols: 1, choices: [
+    { icon: "🟡", label: "Mild — just started noticing it", value: "mild" },
+    { icon: "🟠", label: "Moderate — it's recurring", value: "moderate" },
+    { icon: "🔴", label: "Severe — persistent, nothing has worked", value: "severe" }
+  ]},
+  { type: "options", key: "urgency", label: "When do you want to see results?", cols: 1, choices: [
+    { icon: "⚡", label: "In 3–5 days (urgent)", value: "urgent" },
+    { icon: "📅", label: "In 2–3 weeks", value: "medium" },
+    { icon: "🌱", label: "Long-term improvement", value: "longterm" }
+  ]},
+  { type: "options", key: "experience", label: "Have you tried any treatments before?", cols: 1, choices: [
+    { icon: "✨", label: "First time — never had a facial", value: "first" },
+    { icon: "💆", label: "Yes, I've tried facials before", value: "tried" },
+    { icon: "😔", label: "Tried treatments but didn't see results", value: "noResult" }
+  ]},
+  { type: "bot_dynamic", fn: (s) => {
+    const concernLabels = { acne:"active breakouts", marks:"acne marks", dullness:"dull skin", dehydration:"dehydrated skin" };
+    const skinLabel = s.skin || "your skin";
+    const concernLabel = concernLabels[s.concern] || "your concern";
+    return `Most people with *${skinLabel} skin* and *${concernLabel}* try the wrong treatment and wonder why they don't see results.\n\nBased on everything you've shared, I've identified exactly what your skin needs. Before I reveal it — may I get your name?`;
+  }},
+  { type: "input", key: "name", placeholder: "Your first name", inputMode: "text" },
+  { type: "bot_dynamic", fn: (s) => `Got it, ${s.name}. Your personalised recommendation is ready.\n\nOne last thing — your WhatsApp number so I can send your full consultation summary.` },
+  { type: "input", key: "phone", placeholder: "WhatsApp number", inputMode: "numeric" },
+  { type: "result" }
+];
+
+// ── HELPERS ──
+function now() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function chatArea() { return document.getElementById("chatArea"); }
+
+function scrollBottom() {
+  setTimeout(() => { chatArea().scrollTop = chatArea().scrollHeight; }, 50);
+}
+
+function showTyping(cb, delay = 1200) {
+  const row = document.createElement("div");
+  row.className = "typing-row";
+  row.id = "typingIndicator";
+  row.innerHTML = `
+    <div class="bot-icon">✦</div>
+    <div class="typing-bubble">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>`;
+  chatArea().appendChild(row);
+  scrollBottom();
+  setTimeout(() => {
+    row.remove();
+    cb();
+  }, delay);
+}
+
+function addBotBubble(html, isRec = false) {
+  const row = document.createElement("div");
+  row.className = "bubble-row bot";
+  if (isRec) {
+    row.innerHTML = `<div class="bot-icon">✦</div><div class="rec-bubble">${html}<span class="bubble-time">${now()}</span></div>`;
+  } else {
+    const formatted = html.replace(/\*(.*?)\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    row.innerHTML = `<div class="bot-icon">✦</div><div class="bubble bot">${formatted}<span class="bubble-time">${now()}</span></div>`;
+  }
+  chatArea().appendChild(row);
+  scrollBottom();
+}
+
+function addUserBubble(text) {
+  const row = document.createElement("div");
+  row.className = "bubble-row user";
+  row.innerHTML = `<div class="bubble user">${text}<span class="bubble-time">${now()}</span></div>`;
+  chatArea().appendChild(row);
+  scrollBottom();
+}
+
+function addVoucher() {
+  const row = document.createElement("div");
+  row.className = "bubble-row bot";
+  row.innerHTML = `
+    <div class="bot-icon">✦</div>
+    <div class="voucher-card">
+      <div class="voucher-title">✦ Your Exclusive Offer</div>
+      <div class="voucher-code">GLOW20</div>
+      <div class="voucher-desc">20% off your first treatment when you book this week</div>
+      <div class="voucher-expiry">Valid for 7 days · Mention this code at reception</div>
+    </div>`;
+  chatArea().appendChild(row);
+  scrollBottom();
+}
+
+function hideControls() {
+  document.getElementById("optionsArea").classList.add("hidden");
+  document.getElementById("inputArea").classList.add("hidden");
+}
+
+function showOptions(step) {
+  const area = document.getElementById("optionsArea");
+  const grid = document.getElementById("optionsGrid");
+  const label = document.getElementById("optionsLabel");
+  label.textContent = step.label;
+  grid.className = `options-grid ${step.cols === 2 ? 'cols-2' : 'cols-1'}`;
+  grid.innerHTML = "";
+  step.choices.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerHTML = `<span class="option-icon">${c.icon}</span>${c.label}`;
+    btn.addEventListener("click", () => handleOption(c, step.key));
+    grid.appendChild(btn);
+  });
+  area.classList.remove("hidden");
+  document.getElementById("inputArea").classList.add("hidden");
+}
+
+function showInput(step) {
+  const area = document.getElementById("inputArea");
+  const inp = document.getElementById("textInput");
+  inp.placeholder = step.placeholder;
+  inp.inputMode = step.inputMode || "text";
+  inp.value = "";
+  area.classList.remove("hidden");
+  document.getElementById("optionsArea").classList.add("hidden");
+  setTimeout(() => inp.focus(), 300);
+}
+
+function showCTA() {
+  hideControls();
+  document.getElementById("ctaArea").classList.remove("hidden");
+}
+
+// ── NAVIGATION ──
+function handleOption(choice, key) {
+  state[key] = choice.value;
+  addUserBubble(choice.label);
+  hideControls();
+  advanceStep();
+}
+
+document.getElementById("sendBtn").addEventListener("click", submitInput);
+document.getElementById("textInput").addEventListener("keydown", e => { if (e.key === "Enter") submitInput(); });
+
+function submitInput() {
+  const inp = document.getElementById("textInput");
+  const val = inp.value.trim();
+  if (!val) return;
+  const currentStep = steps[state.step];
+  if (currentStep.type === "input") {
+    if (currentStep.key === "phone" && !/^[6-9]\d{9}$/.test(val.replace(/\s/g, ""))) {
+      inp.style.borderColor = "#e05050";
+      setTimeout(() => inp.style.borderColor = "", 1000);
+      return;
     }
+    state[currentStep.key] = val;
+    addUserBubble(currentStep.key === "phone" ? val.replace(/(\d{5})(\d{5})/, "$1 $2") : val);
+    hideControls();
+    advanceStep();
+  }
+}
 
-    function addMessage(text, sender = 'bot') {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `msg msg-${sender}`;
-        msgDiv.innerText = text;
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+function advanceStep() {
+  state.step++;
+  runStep();
+}
 
-    function showOptions(options, key) {
-        const container = document.createElement('div');
-        container.className = 'options-container';
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = opt;
-            btn.onclick = () => handleOptionClick(opt, key, container);
-            container.appendChild(btn);
-        });
-        chatBox.appendChild(container);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+function runStep() {
+  const step = steps[state.step];
+  if (!step) return;
 
-    function handleOptionClick(val, key, container) {
-        userData[key] = val;
-        container.remove();
-        addMessage(val, 'user');
-        currentStep++;
-        setTimeout(askNext, 600);
-    }
+  if (step.type === "bot") {
+    showTyping(() => {
+      addBotBubble(step.text);
+      advanceStep();
+    }, 900 + step.text.length * 5);
 
-    function askNext() {
-        if (currentStep < questions.length) {
-            showTyping();
-            setTimeout(() => {
-                hideTyping();
-                const q = questions[currentStep];
-                addMessage(q.text);
-                showOptions(q.options, q.id);
-            }, 1000);
-        } else {
-            showLeadForm();
-        }
-    }
+  } else if (step.type === "bot_dynamic") {
+    showTyping(() => {
+      addBotBubble(step.fn(state));
+      advanceStep();
+    }, 900);
 
-    function showLeadForm() {
-        showTyping();
-        setTimeout(() => {
-            hideTyping();
-            addMessage("I’ve analyzed your profile. Most people with your skin type choose the wrong treatment and don’t see results.");
-            addMessage("Please share your details so I can send your specialized Skin Blueprint and priority voucher.");
-            inputContainer.classList.remove('hidden');
-            formFields.innerHTML = `
-                <input type="text" id="user-name" placeholder="Full Name" required>
-                <input type="tel" id="user-phone" placeholder="WhatsApp Number" required>
-            `;
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }, 1000);
-    }
+  } else if (step.type === "options") {
+    setTimeout(() => showOptions(step), 200);
 
-    submitBtn.onclick = () => {
-        const name = document.getElementById('user-name').value;
-        const phone = document.getElementById('user-phone').value;
-        if (!name || !phone) return alert("Please provide your details to see the recommendation.");
-        userData.name = name;
-        userData.phone = phone;
-        inputContainer.classList.add('hidden');
-        showTyping();
-        setTimeout(showFinalResult, 1500);
-    };
+  } else if (step.type === "input") {
+    setTimeout(() => showInput(step), 200);
 
-    function showFinalResult() {
-        hideTyping();
-        let treatment = "";
-        let reasoning = "";
-        let expectation = "";
-        let offerText = "";
-        let ctaText = "Book via WhatsApp Now";
+  } else if (step.type === "result") {
+    showResult();
+  }
+}
 
-        // Advanced Logic Mapping
-        if (userData.concern === 'Active acne / breakouts') {
-            treatment = userData.severity === 'Severe (persistent)' ? "Advanced Medical Grade Acne Protocol" : "The Charcoal Laser Peel";
-            reasoning = `Since you mentioned ${userData.skinType.toLowerCase()} skin and ${userData.concern.toLowerCase()}, generic facials won't help. We need to target the bacteria and regulate sebum production at the root.`;
-            expectation = "You will notice a reduction in inflammation and flatter active lesions within your first session.";
-        } else if (userData.concern === 'Acne marks / pigmentation') {
-            treatment = "The Crystal Glow Micro-Peel";
-            reasoning = `Pigmentation is stubborn. Based on your ${userData.severity.toLowerCase()} case, our protocol uses light-sensitive actives to break down melanin without damaging your ${userData.skinType.toLowerCase()} skin.`;
-            expectation = "Significant lightening of marks and more uniform skin tone over 2-3 weeks.";
-        } else if (userData.concern === 'Dull & uneven tone') {
-            treatment = "The Red-Carpet Hydrafacial";
-            reasoning = `Your ${userData.skinType.toLowerCase()} skin is likely holding onto dead cells. This treatment deeply exfoliates and infuses antioxidants for immediate radiance.`;
-            expectation = "An instant glass-skin finish and refined pores immediately after the session.";
-        } else {
-            treatment = "High-Potency Hyaluronic Infusion";
-            reasoning = `Dehydration in ${userData.skinType.toLowerCase()} skin requires a deep moisture-locking mechanism rather than just surface creams.`;
-            expectation = "Restored bounce and plumpness, eliminating dry patches within 48 hours.";
-        }
+function addVoucherSmart(urgency) {
+  const row = document.createElement("div");
+  row.className = "bubble-row bot";
 
-        // Urgency-based messaging
-        if (userData.urgency === 'In 3–5 days (urgent)') {
-            offerText = "Due to your urgent timeline, we have reserved a priority slot for you. Use code FLASHGLOW for a complimentary rapid-recovery mask.";
-            ctaText = "Claim Priority Slot on WhatsApp";
-        } else {
-            offerText = "To support your long-term skin improvement journey, we are offering 20% OFF your first 3 sessions with code JOURNEY20.";
-            ctaText = "Start My Skin Journey";
-        }
+  const isUrgent = urgency === "urgent";
+  const isLongterm = urgency === "longterm";
 
-        addMessage(`Analysis complete, ${userData.name}. Based on your profile, we recommend: ${treatment}.`);
-        
-        setTimeout(() => {
-            addMessage(reasoning);
-            setTimeout(() => {
-                addMessage(`Expected result: ${expectation}`);
-                
-                const voucherMsg = document.createElement('div');
-                voucherMsg.className = 'msg msg-bot bg-yellow-50 border border-yellow-200 mt-2';
-                voucherMsg.innerHTML = `<strong>🎁 Professional Offer:</strong><br>${offerText}`;
-                chatBox.appendChild(voucherMsg);
+  const voucherCode   = isUrgent ? "FAST15" : isLongterm ? "JOURNEY20" : "GLOW20";
+  const voucherDisc   = isUrgent ? "15% off + Priority Slot" : isLongterm ? "20% off your first session" : "20% off your first treatment";
+  const voucherDesc   = isUrgent
+    ? "Reserved for clients needing visible results within 5 days. Your slot will be confirmed within 30 minutes of booking."
+    : isLongterm
+    ? "Committed to your skin journey. This discount applies to your first session — we'll build your 4-week plan from there."
+    : "Book this week and save 20%. Our team will confirm your appointment within the hour.";
+  const voucherExpiry = isUrgent ? "Valid 48 hours only · Priority booking guaranteed" : "Valid for 7 days · Mention this code at reception";
 
-                const cta = document.createElement('a');
-                cta.className = 'cta-btn';
-                const whatsappText = encodeURIComponent(`Hi! I'm ${userData.name}. My Skin Blueprint recommended the ${treatment} for my ${userData.concern}. I want to book my session!`);
-                cta.href = `https://wa.me/917205661998?text=${whatsappText}`;
-                cta.innerText = ctaText;
-                chatBox.appendChild(cta);
-                
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 800);
-        }, 800);
-    }
+  row.innerHTML = `
+    <div class="bot-icon">✦</div>
+    <div class="voucher-card">
+      <div class="voucher-title">✦ ${isUrgent ? 'Priority Booking Offer' : isLongterm ? 'Skin Journey Offer' : 'Your Exclusive Offer'}</div>
+      <div class="voucher-code">${voucherCode}</div>
+      <div class="voucher-desc">${voucherDisc} — ${voucherDesc}</div>
+      <div class="voucher-expiry">${voucherExpiry}</div>
+    </div>`;
+  chatArea().appendChild(row);
+  scrollBottom();
+}
 
-    setTimeout(askNext, 500);
+function showResult() {
+  const rec = getRecommendation(state.skin, state.concern, state.severity, state.urgency, state.experience);
+
+  const concernLabels  = { acne:"active breakouts", marks:"acne marks and pigmentation", dullness:"dull and uneven skin", dehydration:"dehydration and flakiness" };
+  const severityLabels = { mild:"mild", moderate:"moderate", severe:"severe" };
+  const concernLabel   = concernLabels[state.concern]  || "your concern";
+  const severityLabel  = severityLabels[state.severity] || "";
+  const voucherCode    = state.urgency === "urgent" ? "FAST15" : state.urgency === "longterm" ? "JOURNEY20" : "GLOW20";
+
+  const urgencyClosing = state.urgency === "urgent"
+    ? `We have 2 priority slots open this week — these go fast. Tap below and our team will confirm within 30 minutes. ⚡`
+    : state.urgency === "longterm"
+    ? `Your skin transformation starts with one session. Tap below to book and we'll map out your full 4-week plan on arrival. 🌱`
+    : `Our team will confirm your slot within the hour. We have limited openings this week — don't let this sit. 🗓`;
+
+  showTyping(() => {
+
+    // Personalized opener bubble
+    addBotBubble(
+      `${state.name}, I've reviewed everything you shared — *${state.skin} skin*, *${severityLabel} ${concernLabel}*. Here's what I recommend. 👇`
+    );
+
+    // Rec card
+    setTimeout(() => {
+      addBotBubble(`
+        <div class="rec-tag">✦ Your Personalised Treatment</div>
+        <div class="rec-title">${rec.name}</div>
+        <div class="rec-details" style="margin-bottom:10px">
+          <div class="rec-detail-item">⏱ <span>${rec.duration}</span></div>
+          <div class="rec-detail-item">💰 <span>${rec.price}</span></div>
+        </div>`, true);
+    }, 400);
+
+    // Reasoning bubble
+    setTimeout(() => {
+      showTyping(() => {
+        const reasoningFormatted = rec.reasoning.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+        addBotBubble(`<em style="font-size:12px;color:var(--text-muted);letter-spacing:0.3px">WHY THIS TREATMENT</em><br><br>${reasoningFormatted}`);
+      }, 900);
+    }, 900);
+
+    // Expected result bubble
+    setTimeout(() => {
+      showTyping(() => {
+        addBotBubble(`<em style="font-size:12px;color:var(--text-muted);letter-spacing:0.3px">WHAT YOU'LL SEE</em><br><br>${rec.expectedResult}<br><br><span style="font-size:12px;color:var(--gold-light)">⏳ ${rec.timeframe}</span>`);
+      }, 700);
+    }, 2000);
+
+    // Smart voucher
+    setTimeout(() => {
+      addVoucherSmart(state.urgency);
+    }, 3500);
+
+    // Closing CTA bubble
+    setTimeout(() => {
+      showTyping(() => {
+        addBotBubble(urgencyClosing);
+        setTimeout(showCTA, 300);
+      }, 800);
+    }, 4200);
+
+  }, 1800);
+
+  // WhatsApp message — fully personalised
+  const severityFull   = { mild:"mild (just started)", moderate:"moderate (recurring)", severe:"severe (persistent)" };
+  const urgencyFull    = { urgent:"in 3–5 days", medium:"in 2–3 weeks", longterm:"long-term improvement" };
+  const experienceFull = { first:"first time", tried:"tried facials before", noResult:"tried but saw no results" };
+
+  const msg = encodeURIComponent(
+    `Hi! I just completed the Lumière skin consultation.\n\n` +
+    `*Name:* ${state.name}\n` +
+    `*Skin type:* ${state.skin}\n` +
+    `*Concern:* ${concernLabel} (${severityFull[state.severity] || state.severity})\n` +
+    `*Results timeline:* ${urgencyFull[state.urgency] || state.urgency}\n` +
+    `*Treatment experience:* ${experienceFull[state.experience] || state.experience}\n\n` +
+    `*Recommended treatment:* ${rec.name}\n` +
+    `*Voucher code:* ${voucherCode}\n\n` +
+    `I'd like to book a slot.`
+  );
+
+  document.getElementById("ctaBtn").addEventListener("click", () => {
+    window.open(`https://wa.me/${SALON_WHATSAPP}?text=${msg}`, "_blank");
+  });
+}
+
+// ── START ──
+showTyping(() => {
+  addBotBubble(steps[0].text);
+  state.step = 1;
+  runStep();
+}, 800);
 </script>
-
 </body>
 </html>
